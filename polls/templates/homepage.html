@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Homepage</title>
+  </head>
+  <body>
+
+{% block content %}
+  <div id="container" style="width: 75%;">
+    <canvas id="pie-chart"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script>
+   var color = [];
+
+   var dynamicColors = function() {
+           var r = Math.floor(Math.random() * 255);
+           var g = Math.floor(Math.random() * 255);
+           var b = Math.floor(Math.random() * 255);
+           return "rgb(" + r + "," + g + "," + b + ")";
+        };
+
+    for(var i in {{response}}){
+      color.push(dynamicColors());
+    }
+
+    var config = {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: {{ response |safe }},
+          backgroundColor: color,
+        }, {
+          data: {{ phoneinterview |safe}},
+      backgroundColor: color,
+        }, {
+          data: {{ test |safe}},
+      backgroundColor: color,
+      }, {
+        data: {{ offer |safe}},
+      backgroundColor: color,
+        }, {
+          data: {{ denied |safe}},
+      backgroundColor: color,
+        }],
+        labels: {{company |safe}}
+      },
+
+      options: {
+        elements: {
+          arc: {
+            borderWidth: 1
+          }
+        },
+        responsive: true,
+        tooltips: {
+            callbacks: {
+              title: function(tooltipItem, data) {
+          return data['labels'][tooltipItem[0]['index']];
+        },
+        label: function(tooltipItem, data) {
+          return ''
+        },
+        afterLabel: function(tooltipItem, data) {
+          if(tooltipItem.datasetIndex === 0){
+            return 'Has responded'
+          }else if(tooltipItem.datasetIndex === 1){
+            return 'Has scheduled phone interview'
+          }else if(tooltipItem.datasetIndex === 2){
+            return 'Has scheduled test'
+          }else if(tooltipItem.datasetIndex === 3){
+            return 'Has made an offer'
+          }else if(tooltipItem.datasetIndex === 4){
+            return 'Has denied my application'
+          }
+
+        }
+            },
+        }
+      }
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('pie-chart').getContext('2d');
+      window.myPie = new Chart(ctx, config);
+    };
+
+  </script>
+
+{% endblock %}
+
+    <h1>This is the homepage</h1>
+    <p>Welcome</p>
+  </body>
+</html>
